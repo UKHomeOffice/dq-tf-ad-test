@@ -220,12 +220,12 @@ resource "aws_ssm_document" "ssm_doc" {
 }
 DOC
 
-  lifecycle {
-    ignore_changes = [
-      name,
-      content,
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     name,
+  #     content,
+  #   ]
+  # }
 
 }
 

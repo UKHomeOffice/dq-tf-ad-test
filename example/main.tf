@@ -77,7 +77,7 @@ resource "aws_vpc" "vpc" {
 }
 
 resource "aws_subnet" "subnet" {
-  vpc_id                  = "${element(aws_vpc.vpc.*.id, count.index)}"
+  vpc_id                  = element(aws_vpc.vpc.*.id, count.index)
   availability_zone       = "${data.aws_availability_zones.available.names[0]}"
   cidr_block              = "${cidrsubnet(element(aws_vpc.vpc.*.cidr_block, count.index), 4, 1)}"
   map_public_ip_on_launch = true
@@ -85,7 +85,7 @@ resource "aws_subnet" "subnet" {
 }
 
 resource "aws_security_group" "sg" {
-  vpc_id = "${element(aws_vpc.vpc.*.id, count.index)}"
+  vpc_id = element(aws_vpc.vpc.*.id, count.index)
 
   ingress {
     from_port = 3389
@@ -121,12 +121,12 @@ resource "aws_security_group" "sg" {
 }
 
 resource "aws_internet_gateway" "igw" {
-  vpc_id = "${element(aws_vpc.vpc.*.id, count.index)}"
+  vpc_id = element(aws_vpc.vpc.*.id, count.index)
   count  = local.vpc_count
 }
 
 resource "aws_route_table" "rt" {
-  vpc_id = "${element(aws_vpc.vpc.*.id, count.index)}"
+  vpc_id = element(aws_vpc.vpc.*.id, count.index)
 
   count = local.vpc_count
 }

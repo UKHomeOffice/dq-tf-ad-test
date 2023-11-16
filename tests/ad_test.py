@@ -42,7 +42,7 @@ resource "aws_vpc" "vpc" {
 }
 
 resource "aws_subnet" "subnet" {
-  vpc_id                  = "${element(aws_vpc.vpc.*.id, count.index)}"
+  vpc_id                  = element(aws_vpc.vpc.*.id, count.index)
   availability_zone       = "eu-west-2a"
   cidr_block              = "${cidrsubnet(element(aws_vpc.vpc.*.cidr_block, count.index), 4, 1)}"
   map_public_ip_on_launch = true
@@ -50,7 +50,7 @@ resource "aws_subnet" "subnet" {
 }
 
 resource "aws_route_table" "rt" {
-  vpc_id = "${element(aws_vpc.vpc.*.id, count.index)}"
+  vpc_id = element(aws_vpc.vpc.*.id, count.index)
 
   count = local.vpc_count
 }

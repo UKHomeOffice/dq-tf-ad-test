@@ -18,7 +18,7 @@ module "ad" {
   source = "./mymodule"
 
   providers = {
-    aws = "aws"
+    aws = aws
   }
   cidr_block = "10.1.0.0/16"
 
@@ -37,22 +37,22 @@ locals {
 
 resource "aws_vpc" "vpc" {
   cidr_block           = "192.168.${count.index}.0/24"
-  count                = "${local.vpc_count}"
+  count                = local.vpc_count
   enable_dns_hostnames = true
 }
 
 resource "aws_subnet" "subnet" {
-  vpc_id                  = "${element(aws_vpc.vpc.*.id, count.index)}"
+  vpc_id                  = element(aws_vpc.vpc.*.id, count.index)
   availability_zone       = "eu-west-2a"
   cidr_block              = "${cidrsubnet(element(aws_vpc.vpc.*.cidr_block, count.index), 4, 1)}"
   map_public_ip_on_launch = true
-  count                   = "${local.vpc_count}"
+  count                   = local.vpc_count
 }
 
 resource "aws_route_table" "rt" {
-  vpc_id = "${element(aws_vpc.vpc.*.id, count.index)}"
+  vpc_id = element(aws_vpc.vpc.*.id, count.index)
 
-  count = "${local.vpc_count}"
+  count = local.vpc_count
 }
 
 resource "aws_route_table_association" "association" {

@@ -23,9 +23,9 @@ module "ad" {
   cidr_block = "10.1.0.0/16"
 
   # ^^ not required unless this will clash with your existing
-  peer_with    = "${aws_vpc.vpc.*.id}"
+  peer_with    = aws_vpc.vpc.*.id
   peer_count   = 2
-  subnets      = "${aws_subnet.subnet.*.id}"
+  subnets      = aws_subnet.subnet.*.id
   subnet_count = 2
 }
 data "aws_availability_zones" "available" {}
@@ -56,9 +56,9 @@ resource "aws_route_table" "rt" {
 }
 
 resource "aws_route_table_association" "association" {
-  route_table_id = "${element(aws_route_table.rt.*.id, count.index)}"
-  subnet_id      = "${element(aws_subnet.subnet.*.id, count.index)}"
-  count          = "${local.subnet_count}"
+  route_table_id = element(aws_route_table.rt.*.id, count.index)
+  subnet_id      = element(aws_subnet.subnet.*.id, count.index)
+  count          = local.subnet_count
 }
 
         """

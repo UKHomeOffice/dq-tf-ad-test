@@ -6,6 +6,12 @@ resource "random_string" "AdminPassword" {
   special = false
 }
 
+# resource "aws_ssm_parameter" "AdminPasswordd" {
+#   name  = "AD_AdminPasswordd"
+#   type  = "SecureString"
+#   value = random_string.AdminPassword.result
+# }
+
 locals {
   AdminPassword = var.AdminPassword == false ? var.AdminPassword : random_string.AdminPassword.result
 }
@@ -220,18 +226,11 @@ resource "aws_ssm_document" "ssm_doc" {
 }
 DOC
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     name,
-  #     content,
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      name,
+      content,
+    ]
+  }
 
-
-}
-
-resource "aws_ssm_parameter" "dq_directory_name" {
-  name  = "DQ_Directory_Name"
-  type  = "String"
-  value = "ssm_doc_${random_string.ssm_doc_name.result}"
 }

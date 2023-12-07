@@ -1,5 +1,7 @@
 variable "cidr_block" {
   description = "CIDR block for the AD subnet to use"
+  default     = "10.1.0.0/16"
+  type        = string
 }
 
 variable "peer_with" {
@@ -43,5 +45,15 @@ variable "Domain" {
 variable "allow_remote_vpc_dns_resolution" {
   description = "allow_remote_vpc_dns_resolution on peers"
   default     = true
+}
+
+variable "public_dns_servers" {
+  description = "Map of Public DNS servers."
+  type        = list(string)
+
+  default = [
+    "8.8.8.8",
+    "8.8.4.4",
+  ]
 }
 

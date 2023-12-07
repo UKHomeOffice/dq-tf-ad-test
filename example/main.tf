@@ -3,9 +3,9 @@ module "ad" {
   cidr_block = "10.1.0.0/16"
 
   # ^^ not required unless this will clash with your existing
-  peer_with    = "${aws_vpc.vpc.*.id}"
+  peer_with    = aws_vpc.vpc.*.id
   peer_count   = 2
-  subnets      = "${aws_subnet.subnet.*.id}"
+  subnets      = aws_subnet.subnet.*.id
   subnet_count = 2
 
   Domain = {
@@ -15,7 +15,7 @@ module "ad" {
 }
 
 locals {
-  # annoying work around for Terrafom's inability to calculate counts reliably
+  # annoying work around for Terraform's inability to calculate counts reliably
   vpc_count    = 2
   subnet_count = 2
 }
@@ -26,16 +26,16 @@ provider "aws" {
 
 resource "aws_instance" "win" {
   instance_type = "t2.nano"
-  ami           = "${data.aws_ami.win.id}"
+  ami           = data.aws_ami.win.id
 
-  iam_instance_profile = "${module.ad.ad_writer_instance_profile_name}"
-  subnet_id            = "${element(aws_subnet.subnet.*.id, count.index)}"
+  iam_instance_profile = module.ad.ad_writer_instance_profile_name
+  subnet_id            = element(aws_subnet.subnet.*.id, count.index)
 
   vpc_security_group_ids = [
-    "${element(aws_security_group.sg.*.id, count.index)}",
+    element(aws_security_group.sg.*.id, count.index),
   ]
 
-  count = "${local.subnet_count}"
+  count = local.subnet_count
 }
 
 data "aws_ami" "win" {
@@ -56,16 +56,16 @@ data "aws_ami" "win" {
 
 output "outputs" {
   value = {
-    ad_password = "${module.ad.AdminPassword}"
-    ubuntu      = "${aws_instance.ubuntu.*.public_dns}"
-    windows     = "${aws_instance.win.*.public_dns}"
+    ad_password = module.ad.AdminPassword
+    ubuntu      = aws_instance.ubuntu.*.public_dns
+    windows     = aws_instance.win.*.public_dns
   }
 }
 
 resource "aws_ssm_association" "win" {
-  name        = "${module.ad.ad_aws_ssm_document_name}"
-  instance_id = "${element(aws_instance.win.*.id, count.index)}"
-  count       = "${local.subnet_count}"
+  name        = module.ad.ad_aws_ssm_document_name
+  instance_id = element(aws_instance.win.*.id, count.index)
+  count       = local.subnet_count
 }
 
 data "aws_availability_zones" "available" {}
@@ -78,8 +78,8 @@ resource "aws_vpc" "vpc" {
 
 resource "aws_subnet" "subnet" {
   vpc_id                  = element(aws_vpc.vpc.*.id, count.index)
-  availability_zone       = "${data.aws_availability_zones.available.names[0]}"
-  cidr_block              = "${cidrsubnet(element(aws_vpc.vpc.*.cidr_block, count.index), 4, 1)}"
+  availability_zone       = data.aws_availability_zones.available.names[0]
+  cidr_block              = cidrsubnet(element(aws_vpc.vpc.*.cidr_block, count.index), 4, 1)
   map_public_ip_on_launch = true
   count                   = local.vpc_count
 }
@@ -132,22 +132,22 @@ resource "aws_route_table" "rt" {
 }
 
 resource "aws_route_table_association" "association" {
-  route_table_id = "${element(aws_route_table.rt.*.id, count.index)}"
-  subnet_id      = "${element(aws_subnet.subnet.*.id, count.index)}"
-  count          = "${local.subnet_count}"
+  route_table_id = element(aws_route_table.rt.*.id, count.index)
+  subnet_id      = element(aws_subnet.subnet.*.id, count.index)
+  count          = local.subnet_count
 }
 
 resource "aws_instance" "ubuntu" {
   instance_type = "t2.micro"
-  ami           = "${data.aws_ami.ubuntu.id}"
-  subnet_id     = "${element(aws_subnet.subnet.*.id, count.index)}"
+  ami           = data.aws_ami.ubuntu.id
+  subnet_id     = element(aws_subnet.subnet.*.id, count.index)
   key_name      = "cns"
 
   vpc_security_group_ids = [
-    "${element(aws_security_group.sg.*.id, count.index)}",
+    element(aws_security_group.sg.*.id, count.index),
   ]
 
-  count = "${local.subnet_count}"
+  count = local.subnet_count
 
   user_data = <<EOF
 #!/bin/bash

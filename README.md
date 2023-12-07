@@ -1,4 +1,10 @@
 # Active Directory Terraform Module
+* A version of the dq-tf-ad repository that is used to apply changes on the DQ AWS Test account
+* To update the repository (for equivalence to the live variant):
+  * copy from dq-tf-ad
+  * retain -test specific code
+  * comment out unnecessary elements
+  * ensure AMIs are accessible on Test account
 
 Provides an Active Directory in a dedicated VPC that you can then peer with and consume.
 

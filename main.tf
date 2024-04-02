@@ -1,11 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-    }
-  }
-}
-
 
 resource "random_string" "AdminPassword" {
   length  = 16
